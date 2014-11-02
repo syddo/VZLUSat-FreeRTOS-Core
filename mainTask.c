@@ -24,10 +24,12 @@ int sendFreeHeapSpace(csp_packet_t * inPacket) {
 	outcomingPacket->length = strlen(msg);
 
 	/* Send packet */
-	if (!csp_sendto(CSP_PRIO_NORM, inPacket->id.src, inPacket->id.sport, inPacket->id.dport, CSP_O_NONE, outcomingPacket, 1000)) {
-		/* Send failed */
-	} else {
+	if (csp_sendto(CSP_PRIO_NORM, inPacket->id.src, inPacket->id.sport, inPacket->id.dport, CSP_O_NONE, outcomingPacket, 1000) == CSP_ERR_NONE) {
+		
 		/* Send succeeded */
+		led_red_toggle();
+	} else {
+		/* Send failed */
 	}
 
 	return 0;
@@ -46,10 +48,12 @@ int houseKeeping(csp_packet_t * inPacket) {
 	outcomingPacket->length = strlen(msg);
 
 	/* Send packet */
-	if (!csp_sendto(CSP_PRIO_NORM, inPacket->id.src, inPacket->id.sport, inPacket->id.dport, CSP_O_NONE, outcomingPacket, 1000)) {
-		/* Send failed */
-	} else {
+	if (csp_sendto(CSP_PRIO_NORM, inPacket->id.src, inPacket->id.sport, inPacket->id.dport, CSP_O_NONE, outcomingPacket, 1000) == CSP_ERR_NONE) {
+		
 		/* Send succeeded */
+		led_red_toggle();
+	} else {
+		/* Send failed */
 	}
 
 	return 0;
@@ -62,11 +66,12 @@ int echoBack(csp_packet_t * inPacket) {
 
 	/* Send packet */
 	// reuses the incoming packet for the response
-	if (!csp_sendto(CSP_PRIO_NORM, inPacket->id.src, inPacket->id.sport, inPacket->id.dport, CSP_O_NONE, inPacket, 1000)) {
+	if (csp_sendto(CSP_PRIO_NORM, inPacket->id.src, inPacket->id.sport, inPacket->id.dport, CSP_O_NONE, inPacket, 1000) == CSP_ERR_NONE) {
 		
-		/* Send failed */
-	} else {
 		/* Send succeeded */
+		led_red_toggle();
+	} else {
+		/* Send failed */
 	}
 
 	return 0;

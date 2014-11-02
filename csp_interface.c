@@ -66,7 +66,6 @@ int i2c_init(int handle, int mode, uint8_t addr, uint16_t speed, int queue_len_t
  */
 int i2c_send(int handle, i2c_frame_t * frame, uint16_t timeout) {
 		
-	led_red_toggle();
 	if (TWI_MasterWrite(&twi_csp_master, frame->dest, (uint8_t *) frame->data, frame->len)) {
 		
 		return E_NO_ERR;
