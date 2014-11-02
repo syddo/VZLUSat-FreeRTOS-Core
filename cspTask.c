@@ -6,6 +6,7 @@
  */ 
 
 #include "cspTask.h"
+#include "system.h"
 
 xQueueHandle * xCSPEventQueue;
 
@@ -15,7 +16,7 @@ xQueueHandle * xCSPEventQueue;
 void cspTask(void *p) {
 	
 	/* Create socket without any socket options */
-	csp_socket_t * sock = csp_socket(CSP_SO_CRC32REQ);
+	csp_socket_t * sock = csp_socket(CSP_SO_NONE);
 
 	/* Bind all ports to socket */
 	csp_bind(sock, CSP_ANY);
@@ -37,40 +38,31 @@ void cspTask(void *p) {
 		/* Wait for connection, 10000 ms timeout */
 		if ((conn = csp_accept(sock, 10000)) == NULL)
 		continue;
+		
+		led_red_toggle();
 
 		/* Read packets. Timout is 1000 ms */
 		while ((packet = csp_read(conn, 10)) != NULL) {
+
 			switch (csp_conn_dport(conn)) {
 				
-				/* if Port 15 packet received */
-				// Echo back the incoming packet
+				// response to all except ping
 				case 15:
 				
-					newEvent->eEventType = echoBackEvent;
+					newEvent->eEventType = generalCommEvent;
 					newEvent->pvData = packet;
 					xQueueSend(xCSPEventQueue, newEvent, 10);
 					
 				break;
-					
-				/* if Port 16 packet received */
-				// Free Heap space in Human readable form
-				case 16:
 				
-					newEvent->eEventType = freeHeapEvent;
-					newEvent->pvData = packet;
-					xQueueSend(xCSPEventQueue, newEvent, 10);	
-					
-				break;	
-				
-				/* if Port 17 packet received */
-				// Return info status message
-				case 17:
-				
-					newEvent->eEventType = statusEvent;
+				// response to ping
+				case 32:
+
+					newEvent->eEventType = pingReceivedEvent;
 					newEvent->pvData = packet;
 					xQueueSend(xCSPEventQueue, newEvent, 10);
 				
-				break;		
+				break;
 				
 				/* Process packet here */
 				default:

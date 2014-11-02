@@ -11,17 +11,9 @@
 #include "ioport.h"
 #include "system.h"
 
-#define TWI_CSP_BAUDSETTING TWI_BAUD(F_CPU, CSP_I2C_BAUDRATE)
-
 TWI_Master_t twi_csp_master;		/*!< TWI slave module. */
 TWI_Slave_t twi_csp_slave;			/*!< TWI slave module. */
 i2c_callback_t callbackFunction;
-
-#if MEDIPIX_BOARD == 1
-
-extern UsartBuffer medipix_usart_buffer;
-
-#endif // MEDIPIX_BOARD == 1
 
 // this function processes received data on the I2C Slave line
 // It is call by the I2C driver

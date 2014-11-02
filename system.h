@@ -17,22 +17,29 @@
 #include "csp_clock.h"
 #include "csp_if_i2c.h"
 
-#if MEDIPIX_BOARD == 1
+// LEDs
+#define	YELLOW	IOPORT_CREATE_PIN(PORTD, 4)
+#define	RED	IOPORT_CREATE_PIN(PORTD, 0)
 
-// YELLOW LED on PORTA-0
-#define	YELLOW	IOPORT_CREATE_PIN(PORTA, 0)
-
-// RED LED on PORTA-4
-#define	RED	IOPORT_CREATE_PIN(PORTA, 4)
-
-#define led_yellow_on()		ioport_set_pin_level(YELLOW, true)
-#define led_yellow_off()	ioport_set_pin_level(YELLOW, false)
+/* -------------------------------------------------------------------- */
+/*	Macros for manipulating with LEDs									*/
+/* -------------------------------------------------------------------- */
+#define led_yellow_on()		ioport_set_pin_level(YELLOW, false)
+#define led_yellow_off()	ioport_set_pin_level(YELLOW, true)
 #define led_yellow_toggle()	ioport_toggle_pin_level(YELLOW)
-#define led_red_on()		ioport_set_pin_level(RED, true)
-#define led_red_off()		ioport_set_pin_level(RED, false)
+#define led_red_on()		ioport_set_pin_level(RED, false)
+#define led_red_off()		ioport_set_pin_level(RED, true)
 #define led_red_toggle()	ioport_toggle_pin_level(RED)
+	
+// Uart
+extern UsartBuffer * pc_usart_buffer;
 
-#endif // MEDIPIX_BOARD == 1
+/* -------------------------------------------------------------------- */
+/*	RTC																	*/
+/* -------------------------------------------------------------------- */
+extern volatile uint32_t milisecondsTimer;
+extern volatile uint32_t secondsTimer;
+extern volatile uint32_t hoursTimer;
 	
 /* -------------------------------------------------------------------- */
 /*	Initialize the xMega peripherals									*/

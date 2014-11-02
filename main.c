@@ -13,20 +13,16 @@
 #include "mainTask.h"
 #include "cspTask.h"
 
-#if MEDIPIX_BOARD == 1
-
 // Blinking RTOS task, just for debugging
 void blink(void *p) {
 	
 	while (1) {
 				
-		led_red_toggle();
+		led_yellow_toggle();
 		
-        vTaskDelay(500);
+        vTaskDelay(1000);
 	}
 }
-
-#endif
 
 int main(void) {
 	
@@ -40,27 +36,23 @@ int main(void) {
 	csp_init(CSP_MY_ADDRESS);
 	
 	// Initialize the CSP I2C interface
-	csp_i2c_init(CSP_I2C_SLAVE_ADDRESS, 0, CSP_I2C_BAUDRATE);
+	csp_i2c_init(CSP_I2C_SLAVE_ADDRESS, 0, CSP_I2C_BAUDSETTING);
 					
 	// Add route to OBC via i2c 
-	csp_route_set(CSP_OBC_ADDRESS, &csp_if_i2c, CSP_I2C_OBC_ADDRESS);		
+	csp_route_set(CSP_BOARD_ADDRESS, &csp_if_i2c, CSP_I2C_BOARD_ADDRESS);		
 					
 	// Start router task
 	csp_route_start_task(CSP_ROUTER_STACK, CSP_ROUTER_PRIORITY);
 				
-	#if MEDIPIX_BOARD == 1
-	
 	/* -------------------------------------------------------------------- */
 	/*	Starts blinking task - only for debug								*/
 	/* -------------------------------------------------------------------- */
-	// xTaskCreate(blink, (signed char*) "blink", 64, NULL, configNORMAL_PRIORITY, NULL);
-	
-	#endif // MEDIPIX_BOARD == 1
+	xTaskCreate(blink, (signed char*) "blink", 64, NULL, configNORMAL_PRIORITY, NULL);
 	
 	/* -------------------------------------------------------------------- */
 	/*	Starts task that handles incoming communication		 				*/
 	/* -------------------------------------------------------------------- */
-	xTaskCreate(cspTask, (signed char*) "cspTask", 128, NULL, configNORMAL_PRIORITY, NULL);
+	xTaskCreate(cspTask, (signed char*) "cspTask", 256, NULL, configNORMAL_PRIORITY, NULL);
 	
 	/* -------------------------------------------------------------------- */
 	/*	Starts task that handles outgoing communication		 				*/

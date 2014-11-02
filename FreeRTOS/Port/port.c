@@ -28,6 +28,8 @@
 #include "TC_driver.h"
 #include "pmic_driver.h"
 
+#include "system.h"
+
 /*-----------------------------------------------------------
  * Implementation of functions defined in portable.h for the AVR XMEGA port.
  *----------------------------------------------------------*/

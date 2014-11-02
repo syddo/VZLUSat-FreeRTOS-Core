@@ -2,20 +2,19 @@
  * system.c
  *
  * Created: 11.10.2014 18:40:47
- *  Author: Tomas Baca 
+ *  Author: Tomas Baca
  */
 
- #include "sysclk.h"
- #include "system.h"
+#include "sysclk.h"
+#include "system.h"
+#include "config.h"
+#include "TC_driver.h"
 
- csp_packet_t * outcomingPacket;
+UsartBuffer * pc_usart_buffer;
+volatile uint32_t milisecondsTimer;
+volatile uint32_t secondsTimer;
+volatile uint32_t hoursTimer;
  
- #if MEDIPIX_BOARD == 1
- 
- UsartBuffer * medipix_usart_buffer;
- 
- #endif // MEDIPIX_BOARD == 1
-
 /* -------------------------------------------------------------------- */
 /*	Initialize the xMega peripherals									*/
 /* -------------------------------------------------------------------- */
@@ -33,8 +32,6 @@ void boardInit() {
 	sysclk_enable_module(SYSCLK_PORT_D, 0xff);
 	sysclk_enable_module(SYSCLK_PORT_E, 0xff);
 	sysclk_enable_module(SYSCLK_PORT_F, 0xff);
-		
-	#if MEDIPIX_BOARD == 1
 	
 	ioport_set_pin_dir(RED, IOPORT_DIR_OUTPUT);
 	ioport_set_pin_dir(YELLOW, IOPORT_DIR_OUTPUT);
@@ -42,7 +39,39 @@ void boardInit() {
 	led_yellow_off();
 	led_red_off();
 	
-	medipix_usart_buffer = usartBufferInitialize(&MPX_USART, MPX_USART_BAUDRATE, MPX_USART_BUFFERSIZE);
+	/* -------------------------------------------------------------------- */
+	/*	Timer for RTC														*/
+	/* -------------------------------------------------------------------- */
 	
-	#endif // MEDIPIX_BOARD == 1
+	// select the clock source and pre-scaler by 8
+	TC1_ConfigClockSource(&TCC1, TC_CLKSEL_DIV64_gc);
+	
+	TC1_SetOverflowIntLevel(&TCC1, TC_OVFINTLVL_LO_gc);
+	
+	TC_SetPeriod(&TCC1, 499);
+	
+	milisecondsTimer = 0;
+	secondsTimer = 0;
+	hoursTimer = 0;
+	
+	pc_usart_buffer = usartBufferInitialize(&PC_USART, PC_USART_BAUDRATE, PC_USART_BUFFERSIZE);
+}
+
+/* -------------------------------------------------------------------- */
+/*	Interrupt for timing the RTC										*/
+/* -------------------------------------------------------------------- */
+ISR(TCC1_OVF_vect) {
+	
+	// shut down the output PPM pulse
+	
+	if (milisecondsTimer++ == 1000) { // overflow to seconds
+		
+		milisecondsTimer = 0;
+		
+		if (secondsTimer++ == 3600) { // overflow to hours
+			
+			secondsTimer = 0;
+			hoursTimer++;
+		}
+	}
 }

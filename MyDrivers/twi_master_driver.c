@@ -67,7 +67,7 @@
  *****************************************************************************/
 
 #include "twi_master_driver.h"
-
+#include "system.h"
 
 /*! \brief Initialize the TWI module.
  *

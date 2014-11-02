@@ -18,8 +18,8 @@
 #undef CSP_DEBUG
 #undef CSP_USE_RDP 
 #define CSP_USE_CRC32	1
-#undef CSP_USE_HMAC	1
-#undef CSP_USE_XTEA	1
+#undef CSP_USE_HMAC
+#undef CSP_USE_XTEA
 #undef CSP_USE_PROMISC 
 #undef CSP_USE_QOS 
 #define CSP_BUFFER_STATIC

@@ -12,9 +12,9 @@
 
 typedef enum {
 	
-	echoBackEvent = 0,
-	freeHeapEvent = 1,
-	statusEvent = 2
+	nothingEvent = 0,
+	generalCommEvent = 1,
+	pingReceivedEvent = 2,
 	
 } eCSPEvent_t;
 
@@ -24,6 +24,8 @@ typedef struct CSP_TASK_COMMANDS
 	void *pvData; /* Holds or points to any data associated with the event. */
 
 } xCSPStackEvent_t;
+
+extern xQueueHandle * xCSPEventQueue;
 
 /* -------------------------------------------------------------------- */
 /*	Task that handles CSP incoming packets								*/
