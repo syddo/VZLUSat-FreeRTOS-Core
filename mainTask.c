@@ -40,7 +40,7 @@ int houseKeeping(csp_packet_t * inPacket) {
 	
 	// put the info message into the packet
 	char msg[64];
-	sprintf(msg, "Timepix Board\n\rSoftware v1.0\n\rUptime: %id %ih %im %ds\n\r", (int16_t) hoursTimer/24, (int16_t) hoursTimer%24, (int16_t) secondsTimer/60, (int16_t) secondsTimer%60);
+	sprintf(msg, "*** Board\n\rSoftware v1.0\n\rUptime: %id %ih %im %ds\n\r", (int16_t) hoursTimer/24, (int16_t) hoursTimer%24, (int16_t) secondsTimer/60, (int16_t) secondsTimer%60);
 
 	strcpy(outcomingPacket->data, msg);
 	outcomingPacket->length = strlen(msg);

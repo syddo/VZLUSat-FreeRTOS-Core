@@ -12,16 +12,13 @@
  volatile uint32_t milisecondsTimer;
  volatile uint32_t secondsTimer;
  volatile uint32_t hoursTimer;
- 
- // UART handler
- UsartBuffer * medipix_usart_buffer;
 
 /* -------------------------------------------------------------------- */
 /*	Initialize the xMega peripherals									*/
 /* -------------------------------------------------------------------- */
 void boardInit() {
 	
-	// prepare the i/o for LEDs
+	// prepare i/o
 	ioport_init();
 	
 	// clock init & enable system clock to all peripheral modules
@@ -58,11 +55,6 @@ void boardInit() {
 	
 	led_yellow_off();
 	led_red_off();
-		
-	/* -------------------------------------------------------------------- */
-	/*	Setup UART															*/
-	/* -------------------------------------------------------------------- */
-	medipix_usart_buffer = usartBufferInitialize(&MPX_USART, MPX_USART_BAUDRATE, MPX_USART_BUFFERSIZE);
 }
 
 /* -------------------------------------------------------------------- */

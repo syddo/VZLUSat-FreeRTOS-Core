@@ -6,6 +6,7 @@
  */ 
 
 #include "system.h"
+#include "queue.h"
 
 #ifndef CSPTASK_H_
 #define CSPTASK_H_

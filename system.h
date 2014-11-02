@@ -11,7 +11,6 @@
 #include <avr/io.h>
 #include "config.h"
 #include "ioport.h"
-#include "usart_driver_RTOS.h"
 #include "csp.h"
 #include "csp_thread.h"
 #include "csp_clock.h"
@@ -30,9 +29,6 @@
 #define led_red_on()		ioport_set_pin_level(RED, true)
 #define led_red_off()		ioport_set_pin_level(RED, false)
 #define led_red_toggle()	ioport_toggle_pin_level(RED)
- 
-// UART handler
-extern UsartBuffer * medipix_usart_buffer;
 
 /* -------------------------------------------------------------------- */
 /*	RTC																	*/
