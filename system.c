@@ -9,11 +9,13 @@
 #include "system.h"
 #include "config.h"
 #include "TC_driver.h"
+#include "ioport.h"
+#include "leds.h"
 
 UsartBuffer * pc_usart_buffer;
-volatile uint32_t milisecondsTimer;
-volatile uint32_t secondsTimer;
-volatile uint32_t hoursTimer;
+
+TWI_Master_t twi_csp_master;		/*!< TWI slave module. */
+TWI_Slave_t twi_csp_slave;			/*!< TWI slave module. */
  
 /* -------------------------------------------------------------------- */
 /*	Initialize the xMega peripherals									*/
@@ -38,40 +40,89 @@ void boardInit() {
 	
 	led_yellow_off();
 	led_red_off();
-	
-	/* -------------------------------------------------------------------- */
-	/*	Timer for RTC														*/
-	/* -------------------------------------------------------------------- */
-	
-	// select the clock source and pre-scaler by 8
-	TC1_ConfigClockSource(&TCC1, TC_CLKSEL_DIV64_gc);
-	
-	TC1_SetOverflowIntLevel(&TCC1, TC_OVFINTLVL_LO_gc);
-	
-	TC_SetPeriod(&TCC1, 499);
-	
-	milisecondsTimer = 0;
-	secondsTimer = 0;
-	hoursTimer = 0;
-	
+		
 	pc_usart_buffer = usartBufferInitialize(&PC_USART, PC_USART_BAUDRATE, PC_USART_BUFFERSIZE);
+	
+	/* -------------------------------------------------------------------- */
+	/*	i2C init															*/
+	/* -------------------------------------------------------------------- */
+	
+	// Initialize TWI master for CSP
+	TWI_MasterInit(&twi_csp_master, &CSP_I2C_INTERFACE, TWI_MASTER_INTLVL_LO_gc, CSP_I2C_BAUDSETTING);
+		
+	// Initialize TWI slave for CSP
+	TWI_SlaveInitializeDriver(&twi_csp_slave, &CSP_I2C_INTERFACE, TWI_CSP_SlaveProcessData);
+	TWI_SlaveInitializeModule(&twi_csp_slave, CSP_MY_ADDRESS, TWI_SLAVE_INTLVL_LO_gc);
 }
 
-/* -------------------------------------------------------------------- */
-/*	Interrupt for timing the RTC										*/
-/* -------------------------------------------------------------------- */
-ISR(TCC1_OVF_vect) {
+// this function processes received data on the I2C Slave line
+// It is call by the I2C driver
+void TWI_CSP_SlaveProcessData(void) {
 	
-	// shut down the output PPM pulse
-	
-	if (milisecondsTimer++ == 1000) { // overflow to seconds
+	if (twi_csp_slave.result == TWIS_RESULT_OK) {
 		
-		milisecondsTimer = 0;
-		
-		if (secondsTimer++ == 3600) { // overflow to hours
+		if (twi_csp_slave.bytesReceived > 0) {
 			
-			secondsTimer = 0;
-			hoursTimer++;
+			uint8_t ch;
+			usartBufferPutByte(pc_usart_buffer, '0', 1);
+			usartBufferPutByte(pc_usart_buffer, '|', 1);
+			
+			// copy the data
+			int i;
+			for (i = 0; i < twi_csp_slave.bytesReceived; i++) {
+				
+				// creates the first hex character
+				ch = twi_csp_slave.receivedData[i];
+				ch = ch & 240;
+				ch = ch >> 4;
+				if (ch >= 0 && ch <= 9)
+					ch = ch + '0';
+				else
+					ch = ch + 'A' - 10;
+				usartBufferPutByte(pc_usart_buffer, ch, 1);
+				
+				// creates the second hex character			
+				ch = twi_csp_slave.receivedData[i];
+				ch = ch & 15;
+				if (ch >= 0 && ch <= 9)
+					ch = ch + '0';
+				else
+					ch = ch + 'A' - 10;
+				usartBufferPutByte(pc_usart_buffer, ch, 1);
+				// newFrame.data[i] = twi_csp_slave.receivedData[i];
+			}
+				
+			usartBufferPutByte(pc_usart_buffer, '\n', 1);
+			ledRed = 1;
 		}
 	}
+}
+
+/**
+ * Send I2C frame via the selected device
+ *
+ * @param handle Handle to the device
+ * @param frame Pointer to I2C frame
+ * @param timeout Ticks to wait
+ * @return Error code
+ */
+int i2c_send(int8_t destination, uint8_t * buffer, int8_t data_len) {
+		
+	if (TWI_MasterWrite(&twi_csp_master, destination, (uint8_t *) buffer, data_len)) {
+		
+		return 0;
+	} else {
+		
+		return 1;
+	}
+}
+
+/*! CSP Master Interrupt vector. */
+ISR(CSP_I2C_TWIM) {
+	TWI_MasterInterruptHandler(&twi_csp_master);
+}
+
+/*! CPS Slave Interrupt vector. */
+ISR(CSP_I2C_TWIS) {
+	TWI_SlaveInterruptHandler(&twi_csp_slave);
 }

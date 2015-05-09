@@ -6,103 +6,120 @@
  */
 
 #include "mainTask.h"
-#include "cspTask.h"
 #include "system.h"
 #include "queue.h"
 #include "usart_driver_RTOS.h"
+#include "leds.h"
 
-// to save outcomming time of ping
-uint32_t pingSent;
-
-// for ping time difference
-int16_t timediff;
+#define BUFFER_SIZE 512
 
 /* -------------------------------------------------------------------- */
 /*	The main task														*/
 /* -------------------------------------------------------------------- */
 void mainTask(void *p) {
 	
-	// packet used to handle incoming communication
-	csp_packet_t * outcomingPacket = csp_buffer_get(CSP_PACKET_SIZE);
-
 	// character received from uart
 	char inChar;
+
+	// buffer for message from OBC
+	uint8_t buffer[BUFFER_SIZE];
 	
-	/* The variable used to receive from the queue. */
-	xCSPStackEvent_t xReceivedEvent;
+	// 0 = not receiving
+	// 1 = received address
+	// 2 = receiving message
+	uint8_t receiverState = 0;
 	
-	int i; // iterator
+	uint8_t twiAddress = 0;
 	
-	// text buffer for uart
-	char text[20];
-	
+	int16_t bytesReceived = 0;
+		
 	// infinite while loop of the program 
 	while (1) {
-		
-		if (xQueueReceive(xCSPEventQueue, &xReceivedEvent, 1)) {
-			
-			switch (xReceivedEvent.eEventType) {
-			
-				case generalCommEvent:
-			
-					// send its content to the uart
-					for (i = 0; i < ((csp_packet_t *) xReceivedEvent.pvData)->length; i++) {
-						usartBufferPutByte(pc_usart_buffer, ((csp_packet_t *) xReceivedEvent.pvData)->data[i], 10);
-					}
-			
-				break;
-				case pingReceivedEvent:
-			
-					// calculate the ping return time
-					if ((int16_t) milisecondsTimer - (int16_t) pingSent > 0)
-						timediff = milisecondsTimer - pingSent;
-					else
-						timediff = (int16_t) milisecondsTimer - (int16_t) pingSent + (int16_t) 1000;
-
-					itoa(timediff, text, 10);
-					usartBufferPutString(pc_usart_buffer, "ping received in ", 10);
-					usartBufferPutString(pc_usart_buffer, text, 10);
-					usartBufferPutString(pc_usart_buffer, "ms\n\r", 10);
-			
-				break;
-			
-				default:
-					/* Should not get here. */
-				break;
-			}
-		}
-		
+				
 		// if there is something from the uart
 		if (usartBufferGetByte(pc_usart_buffer, &inChar, 0)) {
-		
-			outcomingPacket->data[0] = inChar;
-			outcomingPacket->length = 1;
-		
-			switch (inChar) {
-			
-				// ask board for free memory heap
-				case 'm':
-					csp_sendto(CSP_PRIO_NORM, CSP_BOARD_ADDRESS, 16, 15, CSP_O_NONE, outcomingPacket, 10);
-				break;
-			
-				// ask board for status
-				case 'h':
-					csp_sendto(CSP_PRIO_NORM, CSP_BOARD_ADDRESS, 17, 15, CSP_O_NONE,  outcomingPacket, 10);
-				break;
-			
-				// ask board for status
-				case 'p':	
-					outcomingPacket->data[0] = 0;
-					outcomingPacket->length = 1;
-					pingSent = milisecondsTimer;
-					csp_sendto(CSP_PRIO_NORM, CSP_BOARD_ADDRESS, 1, 32, CSP_O_NONE, outcomingPacket, 10);
-				break;
-			
-				// sends the char and is supposed to receive it back
-				default:
-					csp_sendto(CSP_PRIO_NORM, CSP_BOARD_ADDRESS, 15, 15, CSP_O_NONE,  outcomingPacket, 10);
-				break;
+
+			// start receiving
+			if (receiverState == 0) {
+				
+				twiAddress = inChar - '0';
+				receiverState = 1;
+				
+			// expecting |
+			} else if (receiverState == 1) {
+				
+				if (inChar == '|') {
+					
+					receiverState = 2;
+					bytesReceived = 0;
+				} else {
+					
+					receiverState = 0;
+				}
+				
+			// receiving message
+			} else if (receiverState == 2) {
+				
+				// message received
+				if (inChar == '\n') {
+					
+					// if the message length is ok
+					if (bytesReceived > 0 && ((bytesReceived % 2) == 0))
+						sendToTwi((uint8_t *) &buffer, bytesReceived, twiAddress);
+						
+					receiverState = 0;
+					bytesReceived = 0;
+				
+				// message being received
+				} else {
+					
+					if (bytesReceived == (BUFFER_SIZE-1)) {
+						
+						receiverState = 0;	
+					}
+					
+					buffer[bytesReceived++] = inChar;
+				}
 			}
 		}
 	}
+}
+
+// send the received message to i2c
+void sendToTwi(uint8_t * buffer, int16_t bytesReceived, uint8_t address) {
+		
+	bytesReceived = bytesReceived/2;
+	
+	int16_t i;
+	for (i = 0; i < bytesReceived; i++) {
+		
+		buffer[i] = hex2bin(&buffer[2*i]);
+	}
+	
+	if (i2c_send(address, buffer, bytesReceived) == 0) {
+		ledYellow = 1;
+	}
+}
+
+// converts two characters in hex to one byte in binary
+uint8_t hex2bin(const uint8_t * ptr) {
+	
+	uint8_t value = 0;
+	uint8_t ch = *ptr;
+	
+	int i;
+	for (i = 0; i < 2; i++) {
+		
+		if (ch >= '0' && ch <= '9')
+			value = (value << 4) + (ch - '0');
+        else if (ch >= 'A' && ch <= 'F')
+			value = (value << 4) + (ch - 'A' + 10);
+        else if (ch >= 'a' && ch <= 'f')
+			value = (value << 4) + (ch - 'a' + 10);
+        else
+			return value;
+        ch = *(++ptr);
+	}
+	
+	return value;
 }

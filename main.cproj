@@ -90,6 +90,7 @@
       <ToolNumber>000200191656</ToolNumber>
       <ToolName>AVRISP mkII</ToolName>
     </com_atmel_avrdbg_tool_ispmk2>
+    <preserveEEPROM>true</preserveEEPROM>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>
@@ -225,15 +226,6 @@
     <Compile Include="config.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="cspTask.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="cspTask.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="csp_interface.c">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="FreeRTOS\FreeRTOSConfig.h">
       <SubType>compile</SubType>
     </Compile>
@@ -297,163 +289,10 @@
     <Compile Include="FreeRTOS\user_board.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="libscp\include\csp\arch\csp_clock.h">
+    <Compile Include="leds.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="libscp\include\csp\arch\csp_malloc.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\arch\csp_queue.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\arch\csp_semaphore.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\arch\csp_system.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\arch\csp_thread.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\arch\csp_time.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp_autoconfig.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp_buffer.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp_cmp.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp_crc32.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp_debug.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp_endian.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp_error.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp_interface.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\csp_platform.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\drivers\i2c.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\drivers\usart.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\interfaces\csp_if_i2c.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\include\csp\interfaces\csp_if_lo.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\arch\freertos\csp_malloc.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\arch\freertos\csp_queue.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\arch\freertos\csp_semaphore.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\arch\freertos\csp_system.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\arch\freertos\csp_thread.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\arch\freertos\csp_time.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\crypto\csp_hmac.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\crypto\csp_hmac.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\crypto\csp_sha1.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\crypto\csp_sha1.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\crypto\csp_xtea.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\crypto\csp_xtea.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_buffer.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_conn.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_conn.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_crc32.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_debug.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_endian.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_io.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_io.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_port.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_port.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_route.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_route.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_services.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_service_handler.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\csp_sfp.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\interfaces\csp_if_i2c.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\interfaces\csp_if_lo.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\transport\csp_rdp.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\transport\csp_transport.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="libscp\src\transport\csp_udp.c">
+    <Compile Include="leds.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
@@ -624,19 +463,6 @@
     <Folder Include="FreeRTOS\Source" />
     <Folder Include="FreeRTOS\Port" />
     <Folder Include="FreeRTOS\Source\include" />
-    <Folder Include="libscp\" />
-    <Folder Include="libscp\include\" />
-    <Folder Include="libscp\include\csp\" />
-    <Folder Include="libscp\include\csp\arch\" />
-    <Folder Include="libscp\include\csp\drivers\" />
-    <Folder Include="libscp\include\csp\interfaces\" />
-    <Folder Include="libscp\src\" />
-    <Folder Include="libscp\src\arch\" />
-    <Folder Include="libscp\src\arch\freertos\" />
-    <Folder Include="libscp\src\crypto\" />
-    <Folder Include="libscp\src\drivers\" />
-    <Folder Include="libscp\src\interfaces\" />
-    <Folder Include="libscp\src\transport\" />
     <Folder Include="MyDrivers" />
     <Folder Include="src\" />
     <Folder Include="src\ASF\" />

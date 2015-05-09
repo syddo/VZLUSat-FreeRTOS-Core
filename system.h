@@ -12,14 +12,16 @@
 #include "config.h"
 #include "ioport.h"
 #include "usart_driver_RTOS.h"
-#include "csp.h"
-#include "csp_thread.h"
-#include "csp_clock.h"
-#include "csp_if_i2c.h"
+#include "twi_master_driver.h"
+#include "twi_slave_driver.h"
 
 // LEDs
 #define	YELLOW	IOPORT_CREATE_PIN(PORTD, 4)
 #define	RED	IOPORT_CREATE_PIN(PORTD, 0)
+
+// Baudrate of the CSP i2c interface
+#define CSP_I2C_BAUDRATE	400000
+#define CSP_I2C_BAUDSETTING TWI_BAUD(F_CPU, CSP_I2C_BAUDRATE)
 
 /* -------------------------------------------------------------------- */
 /*	Macros for manipulating with LEDs									*/
@@ -34,16 +36,16 @@
 // Uart
 extern UsartBuffer * pc_usart_buffer;
 
-/* -------------------------------------------------------------------- */
-/*	RTC																	*/
-/* -------------------------------------------------------------------- */
-extern volatile uint32_t milisecondsTimer;
-extern volatile uint32_t secondsTimer;
-extern volatile uint32_t hoursTimer;
+// i2c
+TWI_Master_t twi_csp_master;		/*!< TWI slave module. */
+TWI_Slave_t twi_csp_slave;			/*!< TWI slave module. */
 	
 /* -------------------------------------------------------------------- */
 /*	Initialize the xMega peripherals									*/
 /* -------------------------------------------------------------------- */
 void boardInit();
+
+void TWI_CSP_SlaveProcessData(void);
+int i2c_send(int8_t destination, uint8_t * buffer, int8_t data_len);
 
 #endif /* SYSTEM_H_ */
