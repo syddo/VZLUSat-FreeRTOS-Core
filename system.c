@@ -59,16 +59,17 @@ void boardInit() {
 // It is call by the I2C driver
 void TWI_CSP_SlaveProcessData(void) {
 	
+	uint8_t ch;
+	
 	if (twi_csp_slave.result == TWIS_RESULT_OK) {
 		
 		if (twi_csp_slave.bytesReceived > 0) {
 			
-			uint8_t ch;
-			usartBufferPutByte(pc_usart_buffer, '0', 1);
-			usartBufferPutByte(pc_usart_buffer, '|', 1);
+			usartBufferPutByte(pc_usart_buffer, '0', 100);
+			usartBufferPutByte(pc_usart_buffer, '|', 100);
 			
 			// copy the data
-			int i;
+			uint16_t i;
 			for (i = 0; i < twi_csp_slave.bytesReceived; i++) {
 				
 				// creates the first hex character
@@ -79,7 +80,7 @@ void TWI_CSP_SlaveProcessData(void) {
 					ch = ch + '0';
 				else
 					ch = ch + 'A' - 10;
-				usartBufferPutByte(pc_usart_buffer, ch, 1);
+				usartBufferPutByte(pc_usart_buffer, ch, 100);
 				
 				// creates the second hex character			
 				ch = twi_csp_slave.receivedData[i];
@@ -88,11 +89,12 @@ void TWI_CSP_SlaveProcessData(void) {
 					ch = ch + '0';
 				else
 					ch = ch + 'A' - 10;
-				usartBufferPutByte(pc_usart_buffer, ch, 1);
+				usartBufferPutByte(pc_usart_buffer, ch, 100);
+								
 				// newFrame.data[i] = twi_csp_slave.receivedData[i];
 			}
 				
-			usartBufferPutByte(pc_usart_buffer, '\n', 1);
+			usartBufferPutByte(pc_usart_buffer, '\n', 100);
 			ledRed = 1;
 		}
 	}

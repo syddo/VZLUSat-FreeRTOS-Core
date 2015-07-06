@@ -46,7 +46,7 @@
 //If you you want another frequency don't forget to modify period of timer counter used for tick interrupt
 #define configTICK_RATE_HZ          ( ( portTickType ) 1000 )
 #define configMINIMAL_STACK_SIZE    ( ( unsigned short ) 64 )//85
-#define configTOTAL_HEAP_SIZE       ( (size_t ) ( 7000 ) )//1500
+#define configTOTAL_HEAP_SIZE       ( (size_t ) ( 5000 ))//1500
 #define configMAX_TASK_NAME_LEN     ( 8 )
 #define configUSE_TRACE_FACILITY    1
 #define configUSE_16_BIT_TICKS      1

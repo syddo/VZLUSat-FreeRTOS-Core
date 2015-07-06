@@ -90,7 +90,7 @@ void sendToTwi(uint8_t * buffer, int16_t bytesReceived, uint8_t address) {
 		
 	bytesReceived = bytesReceived/2;
 	
-	int16_t i;
+	uint16_t i;
 	for (i = 0; i < bytesReceived; i++) {
 		
 		buffer[i] = hex2bin(&buffer[2*i]);

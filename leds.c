@@ -7,15 +7,15 @@
 
 #include "system.h"
 
-int16_t ledRed = 1;
-int16_t ledYellow = 1;
+volatile uint8_t ledRed = 1;
+volatile uint8_t ledYellow = 1;
 
 // Blinking RTOS task, just for debugging
 void leds(void *p) {
 
 	led_yellow_on();
 
-	int i;
+	uint8_t i;
 	for (i = 0; i < 10; i++) {
 
 		led_red_toggle();

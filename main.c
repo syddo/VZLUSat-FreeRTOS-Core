@@ -20,12 +20,12 @@ int main(void) {
 	/* -------------------------------------------------------------------- */
 	/*	Starts blinking task - only for debug								*/
 	/* -------------------------------------------------------------------- */
-	xTaskCreate(leds, (signed char*) "blink", 128, NULL, configNORMAL_PRIORITY, NULL);
+	xTaskCreate(leds, (signed char*) "blink", 512, NULL, configNORMAL_PRIORITY, NULL);
 		
 	/* -------------------------------------------------------------------- */
 	/*	Starts task that handles outgoing communication		 				*/
 	/* -------------------------------------------------------------------- */
-	xTaskCreate(mainTask, (signed char*) "mainTask", 1024, NULL, configNORMAL_PRIORITY, NULL);
+	xTaskCreate(mainTask, (signed char*) "mainTask", 2048, NULL, configNORMAL_PRIORITY, NULL);
 	
 	/* -------------------------------------------------------------------- */
 	/*	Starts the scheduler and all previously created tasks				*/

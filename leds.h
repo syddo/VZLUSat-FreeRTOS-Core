@@ -8,8 +8,8 @@
 #ifndef LEDS_H_
 #define LEDS_H_
 
-int16_t ledRed;
-int16_t ledYellow;
+volatile uint8_t ledRed;
+volatile uint8_t ledYellow;
 
 void leds(void *p);
 
